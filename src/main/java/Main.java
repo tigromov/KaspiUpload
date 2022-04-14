@@ -109,6 +109,7 @@ public class Main {
                 if (midSheet.getRow(i).getCell(4).getNumericCellValue()==0){
                     skuMid = midSheet.getRow(i).getCell(0).getStringCellValue();
                    try{ trdPrice = (int)restSheet.getRow(restList.indexOf(skuMid)).getCell(6).getNumericCellValue();
+                       trdPrice = (int)(trdPrice*1.15);
                        midSheet.getRow(i).createCell(5).setCellValue(trdPrice);}
                    catch (NullPointerException exception){}
                 }
@@ -120,7 +121,8 @@ public class Main {
                         skuMid = midSheet.getRow(i).getCell(0).getStringCellValue();
                         inPrice = (int) restSheet.getRow(restList.indexOf(skuMid)).getCell(4).getNumericCellValue();
                         trdPrice = (int)restSheet.getRow(restList.indexOf(skuMid)).getCell(6).getNumericCellValue();
-                            if(inPrice < nxtPrice& nxtPrice<=trdPrice){ actualPrice = (int) (nxtPrice*0.98);}
+                        trdPrice = (int)(trdPrice*1.15);
+                        if(inPrice < nxtPrice& nxtPrice<=trdPrice){ actualPrice = (int) (nxtPrice*0.98);}
                             else{ actualPrice = trdPrice; }
                         midSheet.getRow(i).createCell(5).setCellValue(actualPrice);}
 
@@ -137,6 +139,7 @@ public class Main {
                 skuMid = midSheet.getRow(i).getCell(0).getStringCellValue();
                 inPrice = (int) restSheet.getRow(restList.indexOf(skuMid)).getCell(4).getNumericCellValue();
                 trdPrice = (int)restSheet.getRow(restList.indexOf(skuMid)).getCell(6).getNumericCellValue();
+                trdPrice = (int)(trdPrice*1.15);
                 if(lowestPrice > (inPrice*1.13)){
                     if(lowestPrice>trdPrice){actualPrice = trdPrice;midSheet.getRow(i).createCell(5).setCellValue(actualPrice);}
                     actualPrice=(int)(lowestPrice*0.98);
