@@ -97,19 +97,59 @@ public class Main {
 
 
         int midRows = midSheet.getLastRowNum();
-        String actualPrice;
+        int actualPrice;
+        int inPrice;
+        int trdPrice;
+        int nxtPrice;
+        int lowestPrice;
+        String skuMid;
         for (int i = 1; i <= midRows; i++) {
+            ////////////если на первом месте MusicPark и больше нет продавцов - то цена –озница/////////////
             if(Objects.equals(midSheet.getRow(i).getCell(3).getStringCellValue(), "MusicPark")){
                 if (midSheet.getRow(i).getCell(4).getNumericCellValue()==0){
-                    String skuMid = midSheet.getRow(i).getCell(0).getStringCellValue();
-                   try{double trPrice = restSheet.getRow(restList.indexOf(skuMid)).getCell(6).getNumericCellValue();
-                       int trdPrice = Integer.valueOf((int) trPrice);
-                       midSheet.getRow(i).createCell(5).setCellValue(trdPrice);
-                   }catch (NullPointerException exception){}
+                    skuMid = midSheet.getRow(i).getCell(0).getStringCellValue();
+                   try{ trdPrice = (int)restSheet.getRow(restList.indexOf(skuMid)).getCell(6).getNumericCellValue();
+                       midSheet.getRow(i).createCell(5).setCellValue(trdPrice);}
+                   catch (NullPointerException exception){}
                 }
-                
+                ///////если на первом месте MusicPark, но есть еще продавцы, то ставит цену либо ниже конкурента на 2%,
+                ///////либо розницу, если цена конкурента выше розницы
+                else{
+                    try{
+                        nxtPrice = (int)midSheet.getRow(i).getCell(4).getNumericCellValue();
+                        skuMid = midSheet.getRow(i).getCell(0).getStringCellValue();
+                        inPrice = (int) restSheet.getRow(restList.indexOf(skuMid)).getCell(4).getNumericCellValue();
+                        trdPrice = (int)restSheet.getRow(restList.indexOf(skuMid)).getCell(6).getNumericCellValue();
+                            if(inPrice < nxtPrice& nxtPrice<=trdPrice){ actualPrice = (int) (nxtPrice*0.98);}
+                            else{ actualPrice = trdPrice; }
+                        midSheet.getRow(i).createCell(5).setCellValue(actualPrice);}
 
+                    catch (NullPointerException e){
+                    //System.out.println("уже сн€т с продажи: " + midSheet.getRow(i).getCell(1).getStringCellValue() + "(отсутствует в наличии на складе јлмата)");
+                }
+
+
+                }
+
+
+            }else{try{
+                lowestPrice = (int)midSheet.getRow(i).getCell(2).getNumericCellValue();
+                skuMid = midSheet.getRow(i).getCell(0).getStringCellValue();
+                inPrice = (int) restSheet.getRow(restList.indexOf(skuMid)).getCell(4).getNumericCellValue();
+                trdPrice = (int)restSheet.getRow(restList.indexOf(skuMid)).getCell(6).getNumericCellValue();
+                if(lowestPrice > (inPrice*1.13)){
+                    if(lowestPrice>trdPrice){actualPrice = trdPrice;midSheet.getRow(i).createCell(5).setCellValue(actualPrice);}
+                    actualPrice=(int)(lowestPrice*0.98);
+                    midSheet.getRow(i).createCell(5).setCellValue(actualPrice);
+                }else{
+                    System.out.println("÷ена конкурента ниже себестоимости на товар: " + midSheet.getRow(i).getCell(1).getStringCellValue());
+                    midSheet.getRow(i).createCell(5).setCellValue(trdPrice);
+                }
+            }catch (NullPointerException e){
+//                System.out.println("уже сн€т с продажи: " + midSheet.getRow(i).getCell(1).getStringCellValue() + "(отсутствует в наличии на складе јлмата)");
             }
+
+        }
 
         }
         FileOutputStream fos = new FileOutputStream(midUrl);
